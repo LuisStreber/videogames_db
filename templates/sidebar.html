@@ -1,0 +1,60 @@
+<aside class="w-64 bg-gray-900 border-r border-gray-700 p-6 space-y-4 text-sm text-green-400" x-data="{ openGames: false, openConsoles: false }">
+    <h2 class="text-xl font-bold mb-4 text-green-300 tracking-wider">📁 Bases de Datos</h2>
+
+    <!-- GAMES -->
+    <div>
+        <button @click="openGames = !openGames" class="font-semibold hover:text-green-200 transition duration-200">
+            🎮 Games
+        </button>
+        <div x-show="openGames" x-transition class="ml-4 mt-2 space-y-2">
+            <p class="font-medium text-green-300">PlayStation</p>
+            <ul class="ml-3 space-y-1">
+                <li><a href="/games/playstation1" class="hover:text-white">PlayStation 1</a></li>
+                <li><a href="/games/playstation2" class="hover:text-white">PlayStation 2</a></li>
+                <li><a href="/games/playstation3" class="hover:text-white">PlayStation 3</a></li>
+                <li><a href="/games/playstation4" class="hover:text-white">PlayStation 4</a></li>
+                <li><a href="/games/playstation5" class="hover:text-white">PlayStation 5</a></li>
+            </ul>
+
+            <p class="font-medium text-green-300 mt-3">Nintendo</p>
+            <ul class="ml-3 space-y-1">
+                <li><a href="/games/wii" class="hover:text-white">Nintendo Wii</a></li>
+                <li><a href="/games/gamecube" class="hover:text-white">Nintendo GameCube</a></li>
+            </ul>
+
+            <p class="font-medium text-green-300 mt-3">Xbox</p>
+            <ul class="ml-3 space-y-1">
+                <li><a href="/games/xbox360" class="hover:text-white">Xbox 360</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- CONSOLES -->
+    <div>
+        <button @click="openConsoles = !openConsoles" class="font-semibold hover:text-green-200 transition duration-200">
+            🕹️ Consoles
+        </button>
+        <div x-show="openConsoles" x-transition class="ml-4 mt-2 space-y-2">
+            <p class="font-medium text-green-300">PlayStation</p>
+            <ul class="ml-3 space-y-1">
+                <li><a href="/consoles/playstation1" class="hover:text-white">PlayStation 1</a></li>
+                <li><a href="/consoles/playstation2" class="hover:text-white">PlayStation 2</a></li>
+                <li><a href="/consoles/playstation3" class="hover:text-white">PlayStation 3</a></li>
+                <li><a href="/consoles/playstation4" class="hover:text-white">PlayStation 4</a></li>
+                <li><a href="/consoles/playstation5" class="hover:text-white">PlayStation 5</a></li>
+            </ul>
+
+            <p class="font-medium text-green-300 mt-3">Nintendo</p>
+            <ul class="ml-3 space-y-1">
+                <li><a href="/consoles/wii" class="hover:text-white">Nintendo Wii</a></li>
+                <li><a href="/consoles/gamecube" class="hover:text-white">Nintendo GameCube</a></li>
+            </ul>
+
+            <p class="font-medium text-green-300 mt-3">Xbox</p>
+            <ul class="ml-3 space-y-1">
+                <li><a href="/consoles/xbox360" class="hover:text-white">Xbox 360</a></li>
+            </ul>
+        </div>
+    </div>
+</aside>
+
