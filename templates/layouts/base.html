@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}VideoGames DB{% endblock %}</title>
+
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Flowbite (necesario para data-modal-toggle) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js" defer></script>
+
+    <!-- AlpineJS (si lo usas para otras interacciones) -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Fuente JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+
+    <!-- Estilo personalizado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        body {
+            background-image: radial-gradient(circle at center, #0f0f0f, #000000);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        a {
+            transition: all 0.2s ease-in-out;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-gray-100">
+
+    <!-- Navbar -->
+    <nav class="bg-gradient-to-r from-gray-800 to-gray-900 shadow-md p-4 flex justify-between items-center text-green-400">
+        <div class="text-2xl font-bold tracking-widest">🧬 VideoGamesDB</div>
+        <div class="space-x-4">
+            <a href="/" class="hover:text-green-200 transition">Home</a>
+            {% if session.get('user_id') %}
+                <a href="/logout" class="hover:text-red-400 transition">Close Session</a>
+            {% else %}
+                <a href="/login" class="hover:text-green-200 transition">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="flex">
+
+        <!-- Sidebar -->
+        {% include 'sidebar.html' %}
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 bg-gray-800 bg-opacity-50 rounded-lg shadow-inner text-gray-100">
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
+
