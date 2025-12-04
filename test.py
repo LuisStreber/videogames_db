@@ -1,5 +1,5 @@
 import os
-import sqlite3
+import pyodbc
 import bcrypt
 import logging
 from flask import Flask, render_template, request, redirect, flash, session, url_for
@@ -35,24 +35,20 @@ def login():
             flash('Username and password are required.', 'error')
             return render_template('login.html')
 
-        conn = get_db_connection()
         try:
+            conn = get_db_connection()
             user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
-        finally:
             conn.close()
 
-        if user and user ['password_hash']:
-            password_hash = user['password_hash']
-            if isinstance(password_hash, str):
-                password_hash = password_hash.encode('utf-8')
-            
-            if bcrypt.checkpw(password.encode('utf-8'), password_hash):
+            if user and bcrypt.checkpw(password.encode('utf-8'), user['password_hash']):
                 session['user_id'] = user['id']
-                session['username'] = user['username']
                 flash('Logged in successfully.', 'success')
                 return redirect('/')
-        
-        flash('Username or password incorrect.', 'Error')
+            else:
+                flash('Username or password incorrect.', 'error')
+        except Exception as e:
+            flash(f'Login error: {e}', 'error')
+            logger.error(f"Login error: {e}")
     return render_template('login.html')
 
 @app.route('/logout')
@@ -67,23 +63,19 @@ def index():
     conn = get_db_connection()
     search_query = request.args.get('q', '')
 
+    if search_query:
+        games = conn.execute(
+            '''
+            SELECT * FROM games
+            WHERE LOWER(title) LIKE ? OR LOWER(genre) LIKE ? OR LOWER(platform) LIKE ?
+            ''',
+            tuple(['%' + search_query.lower() + '%'] * 3)
+        ).fetchall()
+    else:
+        games = conn.execute('SELECT * FROM games').fetchall()
 
-    try:
-        if search_query:
-            games = conn.execute(
-                '''
-                SELECT * FROM games
-                WHERE LOWER(title) LIKE ? OR LOWER(genre) LIKE ? OR LOWER(platform) LIKE ?
-                ''',
-                tuple(['%' + search_query.lower() + '%'] * 3)
-            ).fetchall()
-        else:
-            games = conn.execute('SELECT * FROM games').fetchall()
-
-        consoles = conn.execute('SELECT * FROM consoles').fetchall()
-    finally:
-        conn.close()
-
+    consoles = conn.execute('SELECT * FROM consoles').fetchall()
+    conn.close()
     return render_template('index.html', games=games, consoles=consoles, query=search_query)
 
 @app.route('/games/<platform>')
@@ -95,24 +87,21 @@ def games_by_platform(platform):
     offset = (page - 1) * per_page
     normalized_platform = platform.replace(' ', '').lower()
 
-    try:
-        games = conn.execute(
-            '''
-            SELECT * FROM games
-            WHERE platform_normalized = ?
-            LIMIT ? OFFSET ?
-            ''',
-            (normalized_platform, per_page, offset)
-        ).fetchall()
+    games = conn.execute(
+        '''
+        SELECT * FROM games
+        WHERE platform_normalized = ?
+        LIMIT ? OFFSET ?
+        ''',
+        (normalized_platform, per_page, offset)
+    ).fetchall()
 
-        total = conn.execute(
-            'SELECT COUNT(*) FROM games WHERE platform_normalized = ?',
-            (normalized_platform,)
-        ).fetchone()[0]
+    total = conn.execute(
+        'SELECT COUNT(*) FROM games WHERE platform_normalized = ?',
+        (normalized_platform,)
+    ).fetchone()[0]
 
-    finally:
-        conn.close()
-
+    conn.close()
     return render_template('index.html', games=games, consoles=[], query='', platform=platform,
                            page=page, per_page=per_page, total=total)
 
@@ -125,24 +114,21 @@ def console_by_model(model):
     offset = (page - 1) * per_page
     normalized_model = model.replace(' ', '').lower()
 
-    try:
-        consoles = conn.execute(
-            '''
-            SELECT * FROM consoles
-            WHERE model_normalized = ?
-            LIMIT ? OFFSET ?
-            ''',
-            (normalized_model, per_page, offset)
-        ).fetchall()
+    consoles = conn.execute(
+        '''
+        SELECT * FROM consoles
+        WHERE model_normalized = ?
+        LIMIT ? OFFSET ?
+        ''',
+        (normalized_model, per_page, offset)
+    ).fetchall()
 
-        total = conn.execute(
-            'SELECT COUNT(*) FROM consoles WHERE model_normalized = ?',
-            (normalized_model,)
-        ).fetchone()[0]
+    total = conn.execute(
+        'SELECT COUNT(*) FROM consoles WHERE model_normalized = ?',
+        (normalized_model,)
+    ).fetchone()[0]
 
-    finally:
-        conn.close()
-
+    conn.close()
     return render_template('index.html', games=[], consoles=consoles, query='', model=model,
                            page=page, per_page=per_page, total=total)
 
@@ -192,15 +178,12 @@ def add_game():
             conn.commit()
             flash('Juego añadido exitosamente!', 'success')
             return redirect(url_for('index'))
-        except sqlite3.Error as e:
+        except pyodbc.Error as e:
             logger.error(f"Error adding game: {e}")
             flash(f'Error al añadir juego: {e}', 'error')
-        
+            return redirect(url_for('index'))
         finally:
             conn.close()
-
-        return redirect(url_for('index'))
-    
     return redirect(url_for('index'))  # Redirect to index where modal forms reside
 
 @app.route('/add_console', methods=['GET', 'POST'])
@@ -254,26 +237,22 @@ def add_console():
             conn.commit()
             flash('Consola añadida exitosamente!', 'success')
             return redirect(url_for('index'))
-        except sqlite3.Error as e:
+        except pyodbc.Error as e:
             logger.error(f"Error adding console: {e}")
             flash(f'Error al añadir consola: {e}', 'error')
-        
+            return redirect(url_for('index'))
         finally:
             conn.close()
-
-        return redirect(url_for('index'))
-
     return redirect(url_for('index'))  # Redirect to index where modal forms reside
 
 @app.route('/delete/<int:game_id>', methods=['POST'])
-@login_required
 def delete_game(game_id):
     conn = get_db_connection()
     try:
         conn.execute('DELETE FROM games WHERE id = ?', (game_id,))
         conn.commit()
         flash('Juego eliminado exitosamente!', 'success')
-    except sqlite3.Error as e:
+    except pyodbc.Error as e:
         logger.error(f"Error deleting game: {e}")
         flash(f'Error al eliminar juego: {e}', 'error')
     finally:
@@ -281,14 +260,13 @@ def delete_game(game_id):
     return redirect('/')
 
 @app.route('/delete_console/<int:console_id>', methods=['POST'])
-@login_required
 def delete_console(console_id):
     conn = get_db_connection()
     try:
         conn.execute('DELETE FROM consoles WHERE id = ?', (console_id,))
         conn.commit()
         flash('Consola eliminada exitosamente!', 'success')
-    except sqlite3.Error as e:
+    except pyodbc.Error as e:
         logger.error(f"Error deleting console: {e}")
         flash(f'Error al eliminar consola: {e}', 'error')
     finally:

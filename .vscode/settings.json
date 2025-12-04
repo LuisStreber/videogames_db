@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/c3c4b5b0-e177-4dbb-840a-9b4d1e48e46e/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/videogames-db",
+    "appService.deploySubpath": "."
+}
