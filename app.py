@@ -5,7 +5,7 @@ import logging
 from flask import Flask, render_template, request, redirect, flash, session, url_for
 from functools import wraps
 from dotenv import load_dotenv
-from connection import get_db_connection
+from connection import get_db_connection, get_sqlserver_connection
 
 # Load environment variables
 load_dotenv()
@@ -35,7 +35,7 @@ def login():
             flash('Username and password are required.', 'error')
             return render_template('login.html')
 
-        conn = get_db_connection()
+        conn = get_sqlserver_connection()
         try:
             user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
         finally:
@@ -64,7 +64,7 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-    conn = get_db_connection()
+    conn = get_sqlserver_connection()
     search_query = request.args.get('q', '')
 
 
@@ -89,7 +89,7 @@ def index():
 @app.route('/games/<platform>')
 @login_required
 def games_by_platform(platform):
-    conn = get_db_connection()
+    conn = get_sqlserver_connection()
     page = request.args.get('page', 1, type=int)
     per_page = 50
     offset = (page - 1) * per_page
@@ -100,15 +100,17 @@ def games_by_platform(platform):
             '''
             SELECT * FROM games
             WHERE platform_normalized = ?
-            LIMIT ? OFFSET ?
+            ORDER BY  id
+            OFFSET ? ROWS
+            FETCH NEXT ? ROWS ONLY
             ''',
-            (normalized_platform, per_page, offset)
+            (normalized_platform, offset, per_page)
         ).fetchall()
 
         total = conn.execute(
-            'SELECT COUNT(*) FROM games WHERE platform_normalized = ?',
+            'SELECT COUNT(*) as count FROM games WHERE platform_normalized = ?',
             (normalized_platform,)
-        ).fetchone()[0]
+        ).fetchone()['count']
 
     finally:
         conn.close()
@@ -119,7 +121,7 @@ def games_by_platform(platform):
 @app.route('/consoles/<model>')
 @login_required
 def console_by_model(model):
-    conn = get_db_connection()
+    conn = get_sqlserver_connection()
     page = request.args.get('page', 1, type=int)
     per_page = 50
     offset = (page - 1) * per_page
@@ -130,15 +132,17 @@ def console_by_model(model):
             '''
             SELECT * FROM consoles
             WHERE model_normalized = ?
-            LIMIT ? OFFSET ?
+            ORDER BY id
+            OFFSET ? ROWS
+            FETCH NEXT ? ROWS ONLY
             ''',
-            (normalized_model, per_page, offset)
+            (normalized_model, offset, per_page)
         ).fetchall()
 
         total = conn.execute(
-            'SELECT COUNT(*) FROM consoles WHERE model_normalized = ?',
+            'SELECT COUNT(*) as count FROM consoles WHERE model_normalized = ?',
             (normalized_model,)
-        ).fetchone()[0]
+        ).fetchone()['count']
 
     finally:
         conn.close()
@@ -179,7 +183,7 @@ def add_game():
             return redirect(url_for('index'))
 
         platform_normalized = platform.replace(' ', '').lower()
-        conn = get_db_connection()
+        conn = get_sqlserver_connection()
         try:
             conn.execute('''
                 INSERT INTO games (
@@ -192,7 +196,7 @@ def add_game():
             conn.commit()
             flash('Juego añadido exitosamente!', 'success')
             return redirect(url_for('index'))
-        except sqlite3.Error as e:
+        except Exception as e:
             logger.error(f"Error adding game: {e}")
             flash(f'Error al añadir juego: {e}', 'error')
         
@@ -232,7 +236,7 @@ def add_console():
             return redirect(url_for('index'))
 
         model_normalized = model.replace(' ', '').lower()
-        conn = get_db_connection()
+        conn = get_sqlserver_connection()
         try:
             existing = conn.execute(
                 'SELECT id FROM consoles WHERE serial_number_console = ?',
@@ -254,7 +258,7 @@ def add_console():
             conn.commit()
             flash('Consola añadida exitosamente!', 'success')
             return redirect(url_for('index'))
-        except sqlite3.Error as e:
+        except Exception as e:
             logger.error(f"Error adding console: {e}")
             flash(f'Error al añadir consola: {e}', 'error')
         
@@ -268,12 +272,12 @@ def add_console():
 @app.route('/delete/<int:game_id>', methods=['POST'])
 @login_required
 def delete_game(game_id):
-    conn = get_db_connection()
+    conn = get_sqlserver_connection()
     try:
         conn.execute('DELETE FROM games WHERE id = ?', (game_id,))
         conn.commit()
         flash('Juego eliminado exitosamente!', 'success')
-    except sqlite3.Error as e:
+    except Exception as e:
         logger.error(f"Error deleting game: {e}")
         flash(f'Error al eliminar juego: {e}', 'error')
     finally:
@@ -283,12 +287,12 @@ def delete_game(game_id):
 @app.route('/delete_console/<int:console_id>', methods=['POST'])
 @login_required
 def delete_console(console_id):
-    conn = get_db_connection()
+    conn = get_sqlserver_connection()
     try:
         conn.execute('DELETE FROM consoles WHERE id = ?', (console_id,))
         conn.commit()
         flash('Consola eliminada exitosamente!', 'success')
-    except sqlite3.Error as e:
+    except Exception as e:
         logger.error(f"Error deleting console: {e}")
         flash(f'Error al eliminar consola: {e}', 'error')
     finally:
