@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>429 - Demasiados Intentos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta http-equiv="refresh" content="60;url={{ url_for('login') }}">
+</head>
+
+<body class="bg-black text-[#00f7c8] flex items-center justify-center min-h-screen">
+
+    <div class="text-center p-10 bg-[#021412] border border-[#00f7c8] rounded-2xl shadow-[0_0_25px_#00f7c8] max-w-lg">
+
+        <h1 class="text-9xl font-bold text-[#00f7c8]">429</h1>
+
+        <h2 class="text-3xl font-semibold mt-4">Demasiados Intentos</h2>
+
+        <p class="text-[#00f7c8] mt-4 mb-2">Has excedido el límite de intentos de login.</p>
+
+        <p class="text-[#00f7c8] mb-8">
+            Por favor espera <span class="font-bold">1 minuto</span> antes de intentar de nuevo.
+        </p>
+
+        <div class="bg-[#03201c] p-4 rounded-lg mb-6 border border-[#00f7c8]/40 shadow-[0_0_10px_#00f7c8]">
+            <p class="text-sm text-[#00f7c8]">La página se recargará automáticamente en 60 segundos...</p>
+        </div>
+
+        <a href="{{ url_for('login') }}"
+           class="bg-[#003f37] text-[#00f7c8] px-6 py-3 rounded-lg hover:bg-[#005e52] transition shadow-[0_0_10px_#00f7c8] inline-block">
+            Intentar de Nuevo
+        </a>
+
+    </div>
+
+</body>
+</html>

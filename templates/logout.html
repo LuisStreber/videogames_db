@@ -1,0 +1,29 @@
+<!-- templates/logout.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logout | VideoGamesDB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-black text-[#00f7c8] flex items-center justify-center min-h-screen">
+
+    <div class="text-center bg-[#021412] border border-[#00f7c8] p-10 rounded-2xl shadow-[0_0_25px_#00f7c8] max-w-md">
+        
+        <h1 class="text-4xl font-bold mb-4 text-[#00f7c8] drop-shadow-[0_0_6px_#00f7c8]">
+            🔓 Session Closed
+        </h1>
+
+        <p class="text-[#00f7c8] mb-8">
+            Has cerrado sesión correctamente.
+        </p>
+
+        <a href="{{ url_for('login') }}"
+           class="bg-[#003f37] text-[#00f7c8] px-6 py-3 rounded-lg hover:bg-[#005e52] transition font-semibold shadow-[0_0_10px_#00f7c8]">
+            Volver a Iniciar Sesión
+        </a>
+    </div>
+
+</body>
+</html>

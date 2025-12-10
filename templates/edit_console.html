@@ -1,0 +1,87 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Edit Console{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-6 text-green-400">✏️ Edit Console</h1>
+    
+    <form action="/edit_console/{{ console.id }}" method="post" class="space-y-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        
+        <div>
+            <label class="block text-sm font-semibold mb-2">Name</label>
+            <input type="text" name="name" value="{{ console.name }}" 
+                   class="w-full p-3 border rounded bg-gray-800 text-white border-gray-600" required>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-semibold mb-2">Model</label>
+            <input type="text" name="model" value="{{ console.model }}" 
+                   class="w-full p-3 border rounded bg-gray-800 text-white border-gray-600" required>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-semibold mb-2">Release Date</label>
+            <input type="date" name="release_date" value="{{ console.release_date }}" 
+                   class="w-full p-3 border rounded bg-gray-800 text-white border-gray-600" required>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-semibold mb-2">Manufacturer</label>
+            <input type="text" name="manufacturer" value="{{ console.manufacturer }}" 
+                   class="w-full p-3 border rounded bg-gray-800 text-white border-gray-600" required>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-semibold mb-2">Serial Number (Box)</label>
+            <input type="text" name="serial_number_box" value="{{ console.serial_number_box }}" 
+                   class="w-full p-3 border rounded bg-gray-800 text-white border-gray-600" required>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-semibold mb-2">Serial Number (Console)</label>
+            <input type="text" name="serial_number_console" value="{{ console.serial_number_console }}" 
+                   class="w-full p-3 border rounded bg-gray-800 text-white border-gray-600" required>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-semibold mb-2">Condition</label>
+            <select name="condition" class="w-full p-3 border rounded bg-gray-800 text-white border-gray-600" required>
+                <option value="Nuevo" {% if console.condition == 'Nuevo' %}selected{% endif %}>New</option>
+                <option value="Usado" {% if console.condition == 'Usado' %}selected{% endif %}>Used</option>
+                <option value="Dañado" {% if console.condition == 'Dañado' %}selected{% endif %}>Damaged</option>
+            </select>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-semibold mb-2">Inventory</label>
+            <input type="number" name="inventory" value="{{ console.inventory }}" min="0" 
+                   class="w-full p-3 border rounded bg-gray-800 text-white border-gray-600" required>
+        </div>
+        
+        <div class="flex items-center space-x-6">
+            <label class="flex items-center">
+                <input type="checkbox" name="complete_in_box" class="mr-2" 
+                       {% if console.complete_in_box %}checked{% endif %}>
+                <span>Complete in Box</span>
+            </label>
+            
+            <label class="flex items-center">
+                <input type="checkbox" name="sealed" class="mr-2" 
+                       {% if console.sealed %}checked{% endif %}>
+                <span>Sealed</span>
+            </label>
+        </div>
+        
+        <div class="flex space-x-4 pt-4">
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded font-semibold">
+                💾 Save Changes
+            </button>
+            <a href="/" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded font-semibold inline-block">
+                ❌ Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

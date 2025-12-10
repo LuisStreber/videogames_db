@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>403 - Acceso Denegado</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-black text-[#00f7c8] flex items-center justify-center min-h-screen">
+
+    <div class="text-center p-10 bg-[#021412] border border-[#00f7c8] rounded-2xl shadow-[0_0_25px_#00f7c8] max-w-lg">
+
+        <h1 class="text-9xl font-bold text-[#00f7c8]">403</h1>
+
+        <h2 class="text-3xl font-semibold mt-4">Acceso Denegado</h2>
+
+        <p class="text-[#00f7c8] mt-3 mb-8">No tienes permiso para acceder a esta página.</p>
+
+        <a href="{{ url_for('index') }}"
+           class="bg-[#003f37] text-[#00f7c8] px-6 py-3 rounded-lg hover:bg-[#005e52] transition shadow-[0_0_10px_#00f7c8]">
+            Volver al Inicio
+        </a>
+    </div>
+
+</body>
+</html>
